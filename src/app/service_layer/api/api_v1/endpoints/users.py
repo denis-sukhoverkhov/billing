@@ -5,7 +5,7 @@ from app.service_layer.use_cases import create_user_with_wallet
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from app.service_layer import crud
-from src.app.api import deps
+from app.service_layer.api import deps
 
 router = APIRouter()
 

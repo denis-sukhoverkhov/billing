@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 
-from src.app.api.api_v1.endpoints import users, wallets, transfers
+from app.service_layer.api.api_v1.endpoints import users, wallets, transfers
 
 api_router = APIRouter()
 api_router.include_router(users.router, prefix="/users", tags=["users"])

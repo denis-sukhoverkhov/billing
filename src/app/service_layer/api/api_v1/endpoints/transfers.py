@@ -1,7 +1,7 @@
 from typing import Any
 
 from app.service_layer import crud
-from app.api import deps
+from app.service_layer.api import deps
 from app.domain import entities
 from app.infrastructure.sqlalchemy import models
 from fastapi import APIRouter, Body, Depends, HTTPException

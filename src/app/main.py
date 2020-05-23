@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 
-from src.app.api.api_v1 import api_router
-from src.app.config import settings
+from app.api.api_v1.router import api_router
+from app.config import settings
 
 app = FastAPI(
     title=settings.PROJECT_NAME, openapi_url=f"{settings.API_V1_STR}/openapi.json"
@@ -9,6 +9,10 @@ app = FastAPI(
 
 app.include_router(api_router, prefix=settings.API_V1_STR)
 
+import logging
+
+logging.basicConfig(filename='db.log')
+logging.getLogger('sqlalchemy.engine').setLevel(logging.INFO)
 
 if __name__ == "__main__":
     import uvicorn

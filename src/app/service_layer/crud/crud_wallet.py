@@ -1,6 +1,6 @@
 from typing import Iterable, Optional
 
-from app.crud.base import CRUDBase
+from app.service_layer.crud.base import CRUDBase
 from app.domain.entities.wallet import WalletCreate, WalletUpdate
 from app.infrastructure.sqlalchemy.models.wallet import Wallet
 from sqlalchemy.orm import Session

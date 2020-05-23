@@ -1,4 +1,4 @@
-from app import crud
+from app.service_layer import crud
 from app.domain.entities.user import UserCreate
 from app.domain.entities.wallet import WalletCreate
 from sqlalchemy.orm import Session

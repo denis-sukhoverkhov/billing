@@ -1,6 +1,6 @@
 from typing import Any
 
-from app import crud
+from app.service_layer import crud
 from app.api import deps
 from app.domain import entities
 from app.infrastructure.sqlalchemy import models
@@ -12,7 +12,7 @@ router = APIRouter()
 
 
 @router.post("/from/{wallet_id_source}/to/{wallet_id_receiver}", response_model=entities.Wallet)
-def payment_transfer_from_wallet_to_wallet(
+def payment_transfer_from_source_wallet_to_receiver_wallet(
     *,
     db: Session = Depends(deps.get_db),
     wallet_id_source: int,
@@ -44,5 +44,5 @@ def payment_transfer_from_wallet_to_wallet(
     wallet_source.balance = models.Wallet.balance - amount
     wallet_receiver.balance = models.Wallet.balance + amount
     db.commit()
-    db.refresh(wallet_receiver)
-    return wallet_receiver
+    db.refresh(wallet_source)
+    return wallet_source

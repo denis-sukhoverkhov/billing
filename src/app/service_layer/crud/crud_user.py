@@ -1,6 +1,6 @@
 from typing import Optional
 
-from app.crud.base import CRUDBase
+from app.service_layer.crud.base import CRUDBase
 from app.domain.entities.user import UserCreate, UserUpdate
 from app.infrastructure.sqlalchemy.models import User
 from sqlalchemy.orm import Session

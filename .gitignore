@@ -2,3 +2,5 @@
 .env
 **/__pycache__/**
 src/app.egg-info/*
+.idea/workspace.xml
+db.log

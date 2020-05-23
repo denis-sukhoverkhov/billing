@@ -14,6 +14,20 @@ python-editor = ">=0.3"
 
 [[package]]
 category = "main"
+description = ""
+develop = true
+name = "app"
+optional = false
+python-versions = "*"
+version = "0.1"
+
+[package.source]
+reference = ""
+type = "directory"
+url = "src"
+
+[[package]]
+category = "main"
 description = "Composable command line interface toolkit"
 name = "click"
 optional = false
@@ -300,13 +314,14 @@ python-versions = ">=3.6.1"
 version = "8.1"
 
 [metadata]
-content-hash = "269a64c2985caa3d2a2b054233328205ae6e28011fa6930fc9118dfb07df7703"
+content-hash = "43ded12d26c7d71fdf6630f2545829234cc6e99ac0ab2676cf7f6e048c66d9bb"
 python-versions = "3.8"
 
 [metadata.files]
 alembic = [
     {file = "alembic-1.4.2.tar.gz", hash = "sha256:035ab00497217628bf5d0be82d664d8713ab13d37b630084da8e1f98facf4dbf"},
 ]
+app = []
 click = [
     {file = "click-7.1.2-py2.py3-none-any.whl", hash = "sha256:dacca89f4bfadd5de3d7489b7c8a566eee0d3676333fbb50030263894c38c0dc"},
     {file = "click-7.1.2.tar.gz", hash = "sha256:d2b5255c7c6349bc1bd1e59e08cd12acbbd63ce649f2588755783aa94dfb6b1a"},

@@ -8,6 +8,7 @@
 * pytest - авто-тесты
 
 Запуск проекта - `docker-compose up`
+Документация - http://0.0.0.0:8000/api/v1/docs
 Запуск авто-тестов - `docker-compose -f docker-compose-test.yml up`
 
 

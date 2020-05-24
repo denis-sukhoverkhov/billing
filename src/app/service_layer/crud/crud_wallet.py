@@ -1,54 +1,56 @@
 from typing import Iterable, Optional
 
+from app.infrastructure.sqlalchemy import models
 from app.service_layer.crud.base import CRUDBase
-from app.domain.entities.wallet import WalletCreate, WalletUpdate
-from app.infrastructure.sqlalchemy.models.wallet import Wallet
+from app.domain.entities.wallet import WalletCreate, WalletUpdate, WalletNotFound
 from sqlalchemy.orm import Session
 
 
-class CRUDWallet(CRUDBase[Wallet, WalletCreate, WalletUpdate]):
-    def get_by_pk(self, db: Session, *, pk: int) -> Optional[Wallet]:
-        return db.query(Wallet).filter(Wallet.id == pk).first()
+class CRUDWallet(CRUDBase[models.Wallet, WalletCreate, WalletUpdate]):
+    def get_by_pk(self, db: Session, *, pk: int) -> Optional[models.Wallet]:
+        return db.query(models.Wallet).filter(models.Wallet.id == pk).first()
 
-    def get_by_ids_and_lock(self, db: Session, *, ids: Iterable[int]) -> Optional[Wallet]:
-        return db.query(Wallet).filter(Wallet.id.in_(ids)).with_for_update().all()
+    def get_by_ids_and_lock(self, db: Session, *, ids: Iterable[int]) -> Optional[models.Wallet]:
+        return db.query(models.Wallet).filter(models.Wallet.id.in_(ids)).with_for_update().all()
 
-    def create(self, db: Session, *, obj_in: WalletCreate) -> Wallet:
+    def create(self, db: Session, *, obj_in: WalletCreate) -> models.Wallet:
         db.begin(subtransactions=True)
-        db_obj = Wallet(
+        db_obj = models.Wallet(
             user_id=obj_in.user_id,
         )
         db.add(db_obj)
+        db.flush()
+
+        # write history
+        db.add(models.WalletHistory(
+            wallet_id=db_obj.id,
+            user_id=db_obj.user_id,
+            balance=db_obj.balance,
+        ))
+
         db.commit()
         db.refresh(db_obj)
         return db_obj
 
-    # def update(
-    #     self, db: Session, *, db_obj: User, obj_in: Union[UserUpdate, Dict[str, Any]]
-    # ) -> User:
-    #     if isinstance(obj_in, dict):
-    #         update_data = obj_in
-    #     else:
-    #         update_data = obj_in.dict(exclude_unset=True)
-    #     if update_data["password"]:
-    #         hashed_password = get_password_hash(update_data["password"])
-    #         del update_data["password"]
-    #         update_data["hashed_password"] = hashed_password
-    #     return super().update(db, db_obj=db_obj, obj_in=update_data)
-    #
-    # def authenticate(self, db: Session, *, email: str, password: str) -> Optional[User]:
-    #     user = self.get_by_email(db, email=email)
-    #     if not user:
-    #         return None
-    #     if not verify_password(password, user.hashed_password):
-    #         return None
-    #     return user
-    #
-    # def is_active(self, user: User) -> bool:
-    #     return user.is_active
+    def atomic_enroll_balance(self, db: Session, *, obj_id: int, amount: int) -> models.Wallet:
+        obj = self.get_by_pk(db, pk=obj_id)
+        if not obj:
+            raise WalletNotFound
 
-    # def is_superuser(self, user: User) -> bool:
-    #     return user.is_superuser
+        obj.balance = models.Wallet.balance + amount
+        db.flush()
+
+        # write history
+        db.add(models.WalletHistory(
+            wallet_id=obj.id,
+            user_id=obj.user_id,
+            balance=obj.balance,
+        ))
+
+        db.commit()
+        db.refresh(obj)
+
+        return obj
 
 
-wallet = CRUDWallet(Wallet)
+wallet = CRUDWallet(models.Wallet)

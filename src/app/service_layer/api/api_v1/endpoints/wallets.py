@@ -1,10 +1,10 @@
 from typing import Any
 
+from app.domain import entities
+from app.domain.entities.wallet import WalletNotFound
 from app.service_layer import crud
 from app.service_layer.api import deps
-from app.domain import entities
-from app.infrastructure.sqlalchemy import models
-from fastapi import APIRouter, Depends, Body, HTTPException
+from fastapi import APIRouter, Body, Depends, HTTPException
 from sqlalchemy.orm import Session
 
 router = APIRouter()
@@ -17,14 +17,10 @@ def enroll_cash_to_wallet(
     wallet_id: int,
     amount: int = Body(..., gt=0, embed=True),
 ) -> Any:
-    wallet = crud.wallet.get_by_pk(db, pk=wallet_id)
-    if not wallet:
+    try:
+        return crud.wallet.atomic_enroll_balance(db, obj_id=wallet_id, amount=amount)
+    except WalletNotFound:
         raise HTTPException(
             status_code=400,
             detail="The wallet with this id not exists.",
         )
-
-    wallet.balance = models.Wallet.balance + amount
-    db.commit()
-    db.refresh(wallet)
-    return wallet

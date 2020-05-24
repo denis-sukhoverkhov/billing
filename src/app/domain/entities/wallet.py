@@ -34,3 +34,11 @@ class WalletInDBBase(WalletBase):
 # Additional properties to return via API
 class Wallet(WalletInDBBase):
     pass
+
+
+class WalletNotFound(Exception):
+    pass
+
+
+class InsufficientFundsInTheAccount(Exception):
+    pass

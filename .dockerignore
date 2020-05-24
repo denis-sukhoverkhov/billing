@@ -1,0 +1,10 @@
+.git
+.idea
+.cache
+.venv
+.env
+Dockerfile
+docker-compose.yml
+docker-compose-test.yml
+coverage.xml
+.coverage

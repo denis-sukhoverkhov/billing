@@ -1,4 +1,5 @@
 test:
+	cp .env.example .env
 	python3 -m pytest --junitxml=report.xml --cov-report=xml --cov=.
 
 upgrade_db:

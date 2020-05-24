@@ -8,15 +8,13 @@ services:
     volumes:
     - "$PWD:$PWD"
     working_dir: "$PWD"
-    ports:
-      - 8000:8000
     command:
     - /bin/bash
     - -c
     - |
-      sleep 2
       make upgrade_db &&
-      uvicorn app.main:app
+      cd ./tests &&
+      python3 -m pytest --junitxml=report.xml --cov-report=xml --cov=.
     environment:
       PYTHONDONTWRITEBYTECODE: 1
       POSTGRES_PASSWORD: postgres
@@ -36,3 +34,5 @@ services:
       - 5454:5432
     environment:
       POSTGRES_PASSWORD: postgres
+#    logging:
+#      driver: "none"

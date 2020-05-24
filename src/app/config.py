@@ -5,7 +5,6 @@ from pydantic import BaseSettings, PostgresDsn, validator
 
 class Settings(BaseSettings):
     API_V1_STR: str = "/api/v1"
-    SERVER_NAME: str
     SERVER_HOST: str
     SERVER_PORT: int
     PROJECT_NAME: str

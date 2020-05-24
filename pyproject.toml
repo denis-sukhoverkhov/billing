@@ -18,6 +18,9 @@ app = {path = "src"}
 more-itertools = "~8.3.0"
 
 [tool.poetry.dev-dependencies]
+pytest = "~5.4.2"
+requests = "~2.23.0"
+pytest-cov = "~2.9.0"
 
 [build-system]
 requires = ["poetry>=0.12"]

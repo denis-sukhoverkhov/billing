@@ -1,3 +1,4 @@
+import datetime
 from typing import Iterable, Optional
 
 from app.infrastructure.sqlalchemy import models
@@ -10,6 +11,9 @@ class CRUDWallet(CRUDBase[models.Wallet, WalletCreate, WalletUpdate]):
     def get_by_pk(self, db: Session, *, pk: int) -> Optional[models.Wallet]:
         return db.query(models.Wallet).filter(models.Wallet.id == pk).first()
 
+    def get_by_user_id(self, db: Session, *, user_id: int) -> Optional[models.Wallet]:
+        return db.query(models.Wallet).filter(models.Wallet.user_id == user_id).all()
+
     def get_by_ids_and_lock(self, db: Session, *, ids: Iterable[int]) -> Optional[models.Wallet]:
         return db.query(models.Wallet).filter(models.Wallet.id.in_(ids)).with_for_update().all()
 
@@ -17,6 +21,7 @@ class CRUDWallet(CRUDBase[models.Wallet, WalletCreate, WalletUpdate]):
         db.begin(subtransactions=True)
         db_obj = models.Wallet(
             user_id=obj_in.user_id,
+            balance=obj_in.balance,
         )
         db.add(db_obj)
         db.flush()
@@ -38,6 +43,7 @@ class CRUDWallet(CRUDBase[models.Wallet, WalletCreate, WalletUpdate]):
             raise WalletNotFound
 
         obj.balance = models.Wallet.balance + amount
+        obj.updated_at = datetime.datetime.utcnow()
         db.flush()
 
         # write history

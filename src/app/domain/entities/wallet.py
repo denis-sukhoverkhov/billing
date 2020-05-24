@@ -8,13 +8,7 @@ class WalletBase(BaseModel):
     user_id: int
 
 
-    # email: Optional[EmailStr] = None
-    # is_active: Optional[bool] = True
-
-
 class WalletCreate(WalletBase):
-    # email: EmailStr
-    # password: str
     pass
 
 

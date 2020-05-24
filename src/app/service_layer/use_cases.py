@@ -1,3 +1,5 @@
+import datetime
+
 from app.infrastructure.sqlalchemy import models
 from app.service_layer import crud
 from app.domain.entities.user import UserCreate
@@ -8,7 +10,7 @@ from sqlalchemy.orm import Session
 
 def create_user_with_wallet(db: Session, user_in: UserCreate):
     user = crud.user.create(db, obj_in=user_in)
-    crud.wallet.create(db, obj_in=WalletCreate(user_id=user.id))
+    crud.wallet.create(db, obj_in=WalletCreate(user_id=user.id, balance=0))
     db.commit()
     db.refresh(user)
 
@@ -19,7 +21,8 @@ class DatabaseConsistencyIsBroken(Exception):
     pass
 
 
-def transfer_payment_from_source_to_receiver(db: Session, *, wallet_id_source: int, wallet_id_receiver: int, amount: int):
+def transfer_payment_from_source_to_receiver(
+        db: Session, *, wallet_id_source: int, wallet_id_receiver: int, amount: int):
     wallet_list = crud.wallet.get_by_ids_and_lock(db, ids=(wallet_id_source, wallet_id_receiver))
 
     if len(wallet_list) != 2:
@@ -31,8 +34,11 @@ def transfer_payment_from_source_to_receiver(db: Session, *, wallet_id_source: i
     if wallet_source.balance < amount:
         raise InsufficientFundsInTheAccount
 
+    date_updated = datetime.datetime.utcnow()
     wallet_source.balance = models.Wallet.balance - amount
+    wallet_source.updated_at = date_updated
     wallet_receiver.balance = models.Wallet.balance + amount
+    wallet_receiver.updated_at = date_updated
     db.flush()
 
     # write history for source

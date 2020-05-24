@@ -1,25 +1,24 @@
 from typing import Any
 
-from app.domain.entities.wallet import InsufficientFundsInTheAccount
-from app.service_layer import crud
-from app.service_layer.api import deps
 from app.domain import entities
-from app.infrastructure.sqlalchemy import models
-from app.service_layer.use_cases import transfer_payment_from_source_to_receiver, DatabaseConsistencyIsBroken
-from fastapi import APIRouter, Body, Depends, HTTPException, logger
-from more_itertools import first_true
+from app.domain.entities.wallet import InsufficientFundsInTheAccount
+from app.service_layer.api import deps
+from app.service_layer.use_cases import DatabaseConsistencyIsBroken, transfer_payment_from_source_to_receiver
+from fastapi import APIRouter, Body, Depends, HTTPException
 from sqlalchemy.orm import Session
+from starlette import status
 
 router = APIRouter()
 
 
-@router.post("/from/{wallet_id_source}/to/{wallet_id_receiver}", response_model=entities.Wallet)
+@router.post("/from/{wallet_id_source}/to/{wallet_id_receiver}",
+             response_model=entities.Wallet, status_code=status.HTTP_200_OK)
 def payment_transfer_from_source_wallet_to_receiver_wallet(
-    *,
-    db: Session = Depends(deps.get_db),
-    wallet_id_source: int,
-    wallet_id_receiver: int,
-    amount: int = Body(..., gt=0, embed=True),
+        *,
+        db: Session = Depends(deps.get_db),
+        wallet_id_source: int,
+        wallet_id_receiver: int,
+        amount: int = Body(..., gt=0, embed=True),
 ) -> Any:
     if wallet_id_source == wallet_id_receiver:
         raise HTTPException(
@@ -28,7 +27,7 @@ def payment_transfer_from_source_wallet_to_receiver_wallet(
         )
 
     try:
-         return transfer_payment_from_source_to_receiver(
+        return transfer_payment_from_source_to_receiver(
             db, wallet_id_source=wallet_id_source, wallet_id_receiver=wallet_id_receiver, amount=amount)
     except DatabaseConsistencyIsBroken:
         raise HTTPException(

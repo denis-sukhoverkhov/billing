@@ -4,3 +4,6 @@
 src/app.egg-info/*
 .idea/workspace.xml
 db.log
+coverage.xml
+.coverage
+report.xml
